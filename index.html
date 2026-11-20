@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Color Lab — Laboratório de paletas</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+ <div class="brand"><span class="brand-mark" data-icon="brand"></span>Color Lab</div>
+ <nav aria-label="Seções do Color Lab">
+  <button data-page="lab"><span data-icon="lab"></span>Laboratório</button>
+  <button data-page="saved"><span data-icon="saved"></span>Minhas paletas</button>
+  <button data-page="favorites"><span data-icon="star"></span>Favoritos</button>
+  <button data-page="settings"><span data-icon="settings"></span>Configurações</button>
+ </nav>
+ <small class="local">Ambiente local</small>
+</aside>
+<main>
+ <header class="top"><strong id="breadcrumb">Laboratório</strong><div class="top-actions">
+ <button id="import">↑ Importar JSON</button><button id="save" class="solid">＋ Salvar paleta</button>
+ <input id="file" type="file" accept=".json,application/json" hidden></div></header>
+ <div id="persist" class="persist" role="alert" hidden>O navegador bloqueou o armazenamento ou atingiu o limite. Exporte a paleta em JSON para guardar as alterações.</div>
+ <div class="content">
+ <div class="intro"><h1 id="heading" tabindex="-1">Laboratório de cores</h1><p id="intro">Crie sua paleta e veja como as cores funcionam juntas na web.</p></div>
+ <section id="lab" class="workspace" aria-label="Laboratório">
+  <div class="stack">
+   <section class="panel pad">
+    <div class="section-head"><div><h2>Seletor de cor</h2><p>Explore o círculo ou digite um valor.</p></div></div>
+    <div id="wheel" class="wheel" tabindex="0" role="group" aria-label="Círculo cromático. Use as setas esquerda e direita para o matiz, e acima e abaixo para a saturação."><canvas id="wheel-art" width="240" height="240" aria-hidden="true"></canvas><span id="marker" class="marker"></span></div>
+    <label>Brilho <input id="brightness" type="range" min="0" max="100" step="0.1" value="100"></label>
+    <div class="hex-row"><span class="swatch" id="current" aria-hidden="true"></span><label>HEX<input id="hex" maxlength="7" spellcheck="false" autocomplete="off" aria-describedby="field-error"></label><button id="copy-current" type="button">Copiar</button></div>
+    <div class="field-group"><p>RGB</p><div class="fields" id="rgb-fields"></div></div>
+    <div class="field-group"><p>HSL</p><div class="fields" id="hsl-fields"></div></div>
+    <p id="field-error" class="error" role="status" hidden></p>
+    <button id="add" class="solid full">＋ Adicionar à paleta</button>
+   </section>
+   <section class="panel pad"><div class="section-head"><div><h2>Contraste</h2><p>Compare texto e fundo pelos critérios WCAG.</p></div></div>
+    <div class="contrast-grid"><label>Texto<select id="contrast-text"></select></label><label>Fundo<select id="contrast-bg"></select></label></div>
+    <div class="contrast-sample" id="sample">Aa · Texto de exemplo</div><div class="checks" id="checks" aria-live="polite"></div><details class="spacer"><summary>Critério de texto grande</summary><small>A partir de 24 px em peso regular ou aproximadamente 18,7 px em negrito.</small></details>
+   </section>
+   <details class="panel pad"><summary>Histórico de cores</summary><div id="history" class="history-list"></div></details>
+  </div>
+  <div class="stack">
+   <section class="panel pad">
+    <div class="section-head"><div><h2>Paleta atual</h2><p id="count"></p></div><div class="actions"><button id="random">⤨ Aleatória</button><button id="reset">Restaurar</button></div></div>
+    <div id="strip" class="strip"></div><div id="color-list" class="palette-list"></div>
+    <div class="actions exports"><button id="copy-all">Copiar HEX</button><button id="copy-text">Copiar como texto</button><button id="css">↓ Exportar CSS</button><button id="json">↓ Exportar JSON</button></div>
+   </section>
+   <section class="panel preview-panel">
+    <div class="section-head"><div><h2>Simulador de site</h2><p>Prévia ao vivo da sua paleta.</p></div>
+     <div class="preview-controls"><select id="mode" aria-label="Modelo da simulação"><option value="institutional">Site institucional</option><option value="landing">Landing page</option><option value="dashboard">Dashboard</option></select><select id="theme" aria-label="Tema da simulação"><option value="light">Tema claro</option><option value="dark">Tema escuro</option></select></div>
+    </div>
+    <div class="browser-bar"><i></i><i></i><i></i><small>estudioforma.exemplo</small></div>
+    <div id="site" class="site"></div>
+    <details class="mapping"><summary>Mapear cores da simulação</summary><div id="mapping" class="mapping-grid"></div></details>
+   </section>
+  </div>
+ </section>
+ <section id="gallery" class="cards" aria-label="Paletas salvas" hidden></section>
+ <section id="settings" class="settings panel pad" hidden>
+  <h2>Categorias</h2><div id="categories" class="tags"></div>
+  <form id="category-form"><label>Nova categoria<input name="category" required maxlength="60"></label><button class="solid">Criar categoria</button></form>
+ </section>
+ </div>
+</main>
+</div>
+<div id="toast" class="toast" role="status"></div>
+<dialog id="color-dialog" aria-labelledby="color-title"><form id="color-form">
+<h2 id="color-title">Editar cor</h2><small id="color-id"></small>
+<label>HEX<input name="hex" required maxlength="7" pattern="#?(?:[0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})" spellcheck="false"></label>
+<label>Nome ou função personalizada<input name="name" maxlength="80"></label>
+<label>Papel na simulação<select name="role" id="role-list"></select></label>
+<div class="actions"><button type="button" data-close>Cancelar</button><button class="solid">Aplicar alterações</button></div>
+</form></dialog>
+<dialog id="save-dialog" aria-labelledby="save-title"><form id="save-form">
+<h2 id="save-title">Salvar paleta</h2>
+<label>Nome<input name="title" required maxlength="100"></label>
+<label>Categoria<select name="category" id="save-category"></select></label>
+<label>Descrição<textarea name="description" rows="2" maxlength="1000"></textarea></label>
+<label>Observações<textarea name="notes" rows="3" maxlength="2000"></textarea></label>
+<div class="actions"><button type="button" data-close>Cancelar</button><button id="save-copy" type="submit" value="copy">Salvar como nova</button><button class="solid" type="submit">Salvar paleta</button></div>
+</form></dialog>
+<script src="js/app.js"></script>
+</body>
+</html>
